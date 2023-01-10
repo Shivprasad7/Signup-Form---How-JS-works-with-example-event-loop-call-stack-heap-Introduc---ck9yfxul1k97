@@ -1,76 +1,159 @@
-import React, { Component, useState } from "react";
-import MainForm from "./MainForm/";
-//import "./styles/App.css";
+import React, { useState } from "react";
+import "../styles/App.css";
 
 const App = () => {
-  const [uName, setUname] = useState("");
-  const [eMail,setEmail] = useState("");
-  const [gender,setGender] = useState("Male");
-  const [phone,setPhone] = useState("");
-  const [password,setPassword] = useState("");
-  const [errorMsg,setErrormsg] = useState("");
+  const [inputs, setInputs] = useState({
+    name: "",
+    email: "",
+    gender: "male",
+    phoneNumber: "",
+    password: "",
+    message: ""
+  });
+  function handleChange(el) {
+    let name = el.target.name;
+    let value = el.target.value;
 
-  const handleName = (event) => {
-    setUname(event.target.value);
-  };
-
-  const handleEmail = (event) => {
-    setEmail(event.target.value);
-  };
-
-  const handleGender = (event) => {
-    setGender(event.target.value);
-  };
-
-  const handlePhone = (event) => {
-    setPhone(event.target.value);
-  };
-
-  const handlePassword = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const handleSubmit = (e) =>{
-    console.log("submit button clicked");
-    // console.log(uName);
-    // console.log(eMail);
-    // console.log(gender);
-    // console.log(phone);
-    // console.log(password);
-    if(!uName || !eMail || !phone || !password ){
-      setErrormsg("All fields are mandatory");
-      e.preventDefault();
-      return;
-    }
-    else if(!uName.match(/^[0-9a-z]+$/)){
-      setErrormsg("Name is not alphanumeric");
-      e.preventDefault();
-      return;
-    }
-    else if(!eMail.match(/\S+@\S+\.\S+/)){
-      setErrormsg("Email must contain @");
-      e.preventDefault();
-      return;
-    }
-    else{
-      var name = eMail.substring(0, eMail.lastIndexOf("@"));
-      setErrormsg("Hello "+name);
-      e.preventDefault();
-    }
-    console.log("submitted")
+    setInputs((prevValue) => {
+      return {
+        ...prevValue,
+        [name]: value
+      };
+    });
   }
+
+  function handleClick(el) {
+    let name = inputs.name.trim();
+    let email = inputs.email.trim();
+    let gender = inputs.gender.trim();
+    let phoneNumber = inputs.phoneNumber.trim();
+    let password = inputs.password.trim();
+    console.log(gender);
+
+    if (
+      name === "" ||
+      email === "" ||
+      gender === "" ||
+      phoneNumber === "" ||
+      password === ""
+    ) {
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "All fields are mandatory"
+        };
+      });
+      return;
+    }
+
+    if (!/^[\w\-\s]+$/.test(name)) {
+      //for alpha numeric name
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "Name is not alphanumeric"
+        };
+      });
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "Email must contain @"
+        };
+      });
+      return;
+    }
+
+    if (gender !== "male" && gender !== "female" && gender !== "others") {
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "Please identify as male, female or others"
+        };
+      });
+      return;
+    }
+
+    if (isNaN(phoneNumber)) {
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "Phone Number must contain only numbers"
+        };
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      setInputs((prevValue) => {
+        return {
+          ...prevValue,
+          message: "Password must contain atleast 6 letters"
+        };
+      });
+      return;
+    }
+
+    let msg = inputs.email.split("@");
+    msg = msg[0];
+    setInputs((prevValue) => {
+      return {
+        ...prevValue,
+        message: `Hello ${msg}`
+      };
+    });
+  }
+
   return (
     <div id="main">
-      <MainForm
-        handleName={handleName}
-        handleEmail={handleEmail}
-        handleGender={handleGender}
-        defGender={gender}
-        handlePhone={handlePhone}
-        handlePassword={handlePassword}
-        handleSubmit={handleSubmit}
-        showError={errorMsg}
+      <input
+        type="text"
+        name="name"
+        onChange={handleChange}
+        placeholder="Enter Name e.g. John Doe"
+        data-testid="name"
+        value={inputs.name}
       />
+      <input
+        type="email"
+        name="email"
+        onChange={handleChange}
+        placeholder="Enter Email e.g.example@gmail.com"
+        data-testid="email"
+        value={inputs.email}
+      />
+      <input
+        type="text"
+        name="gender"
+        onChange={handleChange}
+        default="Male"
+        placeholder="Enter Gender e.g. Male/Female/Others"
+        data-testid="gender"
+        value={inputs.gender}
+      />
+      <input
+        type="text"
+        name="phoneNumber"
+        onChange={handleChange}
+        placeholder="Enter Phone number"
+        data-testid="phoneNumber"
+        value={inputs.phoneNumber}
+      />
+      <input
+        type="password"
+        name="password"
+        onChange={handleChange}
+        placeholder="Enter Password"
+        data-testid="password"
+        value={inputs.password}
+      />
+      <button data-testid="submit" onClick={handleClick}>
+        Submit
+      </button>
+      <div>{inputs.message}</div>
     </div>
   );
 };
